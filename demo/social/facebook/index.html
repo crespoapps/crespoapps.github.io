@@ -1,0 +1,52 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title class="page-title">Facebook</title>
+</head>
+<body>
+    <script>
+        window.fbAsyncInit = function () {
+            FB.init({
+                appId: '399784350080847',
+                xfbml: true,
+                version: 'v2.2'
+            });
+        };
+
+        (function (d, s, id) {
+            var js, fjs = d.getElementsByTagName(s)[0];
+            if (d.getElementById(id)) { return; }
+            js = d.createElement(s); js.id = id;
+            js.src = "//connect.facebook.net/en_US/sdk.js";
+            fjs.parentNode.insertBefore(js, fjs);
+        }(document, 'script', 'facebook-jssdk'));
+    </script>
+    <h2>fb-like</h2>
+    <div class="fb-like" data-share="true" data-width="450" data-show-faces="true"></div>
+    <br/><br />
+    <h2>fb-facepile</h2>
+    <div class="fb-facepile" data-href="https://www.facebook.com/chargers" data-max-rows="1" data-colorscheme="light" data-size="large" data-show-count="true"></div>
+    <br /><br />
+    <h2>fb-like-box</h2>
+    <table style="width:100%;">
+        <tr>
+            <td>
+            <div class="fb-like-box" data-href="https://www.facebook.com/chargers"
+                 data-width="450"
+                 data-height="600"
+                 data-stream="false"
+                 data-header="true"
+                 data-show-faces="true"></div>
+            </td><td>
+                <div class="fb-like-box" data-href="https://www.facebook.com/chargers"
+                     data-width="450"
+                     data-height="600"
+                     data-stream="true"
+                     data-header="false"
+                     data-show-faces="false"></div>
+            </td>
+        </tr>
+    </table>
+</body>
+</html>
