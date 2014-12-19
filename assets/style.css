@@ -1,0 +1,10 @@
+﻿body, a 
+{
+    font-family: 'Titillium Web', sans-serif; font-size:3em;
+}
+a:hover {
+    text-decoration:none;
+}
+ul {
+    list-style-type:lower-greek;
+}
