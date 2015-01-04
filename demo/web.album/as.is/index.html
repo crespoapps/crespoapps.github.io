@@ -1,0 +1,20 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+  <title>Crespo Apps Web Album Demo</title>
+</head>
+<body>
+  <div id="content"></div>
+  <script src="https://code.jquery.com/jquery-1.11.2.min.js"></script>
+  <script>
+    $(function () {
+      $.ajax({ url: "http://picasaweb.google.com/data/feed/api/user/crespoapps/album/webdemo?alt=json&fields=entry/content" })
+       .done(function (data) {
+         $.each(data.feed.entry, function () {
+           $("#content").append('<img src="' + this.content.src + '" />')
+         });
+       });
+    })
+  </script>
+</body>
+</html>
