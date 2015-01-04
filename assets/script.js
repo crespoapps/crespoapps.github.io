@@ -1,6 +1,21 @@
 ﻿document.write('<script async src="//pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>');
-document.write('<script src="/demo/raphael.js/crespo.apps/raphael-min.js"></script>');
+document.write('<script src="/demos/raphael.js/crespo.apps/raphael-min.js"></script>');
 $(function () {
+  function getBreadcrumbs() {
+    function getCrumb(crumb) {
+      var i = crumb.lastIndexOf("/");
+      if (i < 0) return "";
+      var name = crumb.substr(i + 1, 1).toUpperCase() + crumb.substr(i + 2);
+      return '<a href="' + crumb + '">' + name + '</a>';
+    }
+    var path, html = "";
+    var path = (document && document.location && document.location.pathname ? document.location.pathname.replace("/index.html", ""):"");
+    var index = 1;
+    while ((index = path.indexOf("/", index + 1)) > -1) {
+      html += " &gt;&gt; "  + getCrumb(path.substr(0, index));
+    }
+    return html;
+  }
   function renderLogo() {
     var size = 200;
     var paper = new Raphael(document.getElementById('canvas_container'), size, size);
@@ -71,8 +86,9 @@ $(function () {
       '"></ins><script>(adsbygoogle=window.adsbygoogle||[]).push({}); </script>';
     return ad;
   }
-  $(".container-fluid").first().wrapInner('<div class="row"></div>');
+  $(".container-fluid").wrapInner('<div id="main-content" class="row"></div>').prepend('<div id="breadcrumbs" class="row"><a href="/">Home</a></div>');
   $("ul").addClass("col-sm-4");
-  $(".row").first().append('<div class="col-sm-4"><a id="canvas_container" href="//www.crespoapps.com"></a>' + getAd(2541627380, 'ad-box') + '</div><div class="col-sm-4">&nbsp;</div>');
+  $("#breadcrumbs").append(getBreadcrumbs());
+  $("#main-content").append('<div class="col-sm-4"><a id="canvas_container" href="//www.crespoapps.com"></a>' + getAd(2541627380, 'ad-box') + '</div><div class="col-sm-4">&nbsp;</div>');
   renderLogo();
 });
