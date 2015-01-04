@@ -1,6 +1,20 @@
-﻿body, a 
+﻿body 
+{ 
+
+background: rgb(240,249,255); /* Old browsers */
+background: -moz-radial-gradient(center, ellipse cover,  rgba(240,249,255,1) 0%, rgba(203,235,255,1) 47%, rgba(161,219,255,1) 100%); /* FF3.6+ */
+background: -webkit-gradient(radial, center center, 0px, center center, 100%, color-stop(0%,rgba(240,249,255,1)), color-stop(47%,rgba(203,235,255,1)), color-stop(100%,rgba(161,219,255,1))); /* Chrome,Safari4+ */
+background: -webkit-radial-gradient(center, ellipse cover,  rgba(240,249,255,1) 0%,rgba(203,235,255,1) 47%,rgba(161,219,255,1) 100%); /* Chrome10+,Safari5.1+ */
+background: -o-radial-gradient(center, ellipse cover,  rgba(240,249,255,1) 0%,rgba(203,235,255,1) 47%,rgba(161,219,255,1) 100%); /* Opera 12+ */
+background: -ms-radial-gradient(center, ellipse cover,  rgba(240,249,255,1) 0%,rgba(203,235,255,1) 47%,rgba(161,219,255,1) 100%); /* IE10+ */
+background: radial-gradient(ellipse at center,  rgba(240,249,255,1) 0%,rgba(203,235,255,1) 47%,rgba(161,219,255,1) 100%); /* W3C */
+filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#f0f9ff', endColorstr='#a1dbff',GradientType=1 ); /* IE6-9 fallback on horizontal gradient */
+
+
+}
+body, a 
 {
-    font-family: 'Titillium Web', sans-serif; font-size:3em;
+    font-family: 'Titillium Web', sans-serif; font-size:2em;
 }
 a:hover {
     text-decoration:none;
@@ -8,3 +22,14 @@ a:hover {
 ul {
     list-style-type:lower-greek;
 }
+.ad-box { 
+
+display: block; margin: 0 auto;
+width: 300px; height: 250px; 
+}
+.ad-sky { 
+display: block; margin: 0 auto;
+width:120px;height:600px
+
+}
+#canvas_container svg { display: block; margin: 50px auto; }
