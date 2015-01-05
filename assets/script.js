@@ -86,7 +86,12 @@ $(function () {
       '"></ins><script>(adsbygoogle=window.adsbygoogle||[]).push({}); </script>';
     return ad;
   }
-  $(".container-fluid").wrapInner('<div id="main-content" class="row"></div>').prepend('<div id="breadcrumbs" class="row"><a href="/">Home</a></div>');
+  $("head").append('<link href="http://fonts.googleapis.com/css?family=Audiowide&amp;text=Crespo+Apps&amp;effect=stonewash" rel="stylesheet" type="text/css">');
+  $("body").addClass("ca");
+  $(".container-fluid").wrapInner('<div id="main-content" class="row"></div>').prepend('<div id="header" class="row"><h1 class="label font-effect-stonewash">&nbsp;</h1><div id="breadcrumbs"><a href="/">Home</a></div></div>');
+  setTimeout(function () {
+    $(".font-effect-stonewash").html('<a href="//www.crespoapps.com"><span class="t0">C</span>re<span class="t1">s</span>po <span class="t2">A</span>pp<span class="t3">s</span></a>');
+  }, 500);
   $("ul").addClass("col-sm-4");
   $("#breadcrumbs").append(getBreadcrumbs());
   $("#main-content").append('<div class="col-sm-4"><a id="canvas_container" href="//www.crespoapps.com"></a>' + getAd(2541627380, 'ad-box') + '</div><div class="col-sm-4">&nbsp;</div>');
