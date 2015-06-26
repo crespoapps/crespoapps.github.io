@@ -21,7 +21,7 @@ function statusChangeCallback(response) {
             // they are logged into this app or not.
             app = 'Facebook.';
         }
-        document.getElementById('status').innerHTML = 'Please log into ' + app;
+        $("#status").html('Please log into ' + app);
     }
 }
 
@@ -46,16 +46,19 @@ fjs.parentNode.insertBefore(js, fjs);
 
 // Here we run a very simple test of the Graph API after login is
 // successful.  See statusChangeCallback() for when this call is made.
-function showLoggedIn(){
-  $(".logged-in").show();    
-  $("#status").html('Welcome!  Fetching your information.... ');
-  FB.api('/me', function(response) {
-      console.log('Successful login for: ' + response.name);
-      console.log(response);
-  });
+function showLoggedIn() {
+    $(".logged-in").show();
+    $(".logged-out").hide();
+    $("#status").html('Welcome!  Fetching your information.... ');
+    FB.api('/me', function (response) {
+        $("#status").html("'Successful login for: " + response.name);
+        console.log(response);
+    });
 }
 function showLoggedOut(){
     $(".logged-out").show();
+    $(".logged-in").hide();
+    $("#status").html("You are logged out");
 }
 
 $(function () {
