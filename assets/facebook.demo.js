@@ -83,7 +83,7 @@ $(function () {
         FB.login(function(response) {
             console.log("fb-login-button response");
             console.log(response);
-        }, {scope: 'user_friends,public_profile,email,user_place_visits,age_range '});
+        }, {scope: 'user_friends,public_profile,email,age_range,user_birthday'});
 
     });
     
