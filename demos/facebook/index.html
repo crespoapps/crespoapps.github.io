@@ -1,18 +1,21 @@
 <!DOCTYPE html>
 <html>
 <head>
-<title>Facebook Login JavaScript Example</title>
-<meta charset="UTF-8">
+    <title>Facebook Login JavaScript Example</title>
+    <meta charset="UTF-8">
+    <style>
+        .logged-out, .logged-in{ display: none;}
+    </style>
 </head>
 <body>
-<div class="logged-out" style="display:none;">
-    <button id="fb-login-button"> Facebook LOGIN</button>
-</div>    
-<div class="logged-in" style="display:none;">
-</div>    
-<div id="status">
-</div>
-<script src="https://code.jquery.com/jquery-1.11.2.min.js"></script>
+    <div class="logged-out">
+        <button id="fb-login-button"> Facebook logIN</button>
+    </div>    
+    <div class="logged-in">
+        <button id="fb-logout-button"> Facebook logOUT</button>
+    </div>  
+    <div id="status"></div>
+    <script src="https://code.jquery.com/jquery-1.11.2.min.js"></script>
     <script src="/assets/facebook.demo.js"></script>
 </body>
 </html>
