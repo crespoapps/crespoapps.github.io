@@ -71,13 +71,20 @@
   function testAPI() {
     console.log('Welcome!  Fetching your information.... ');
     FB.api('/me', function(response) {
-      console.log('Successful login for: ' + response.name);
-        
-        var html = "<table>";
-        for(var key in response) { 
-            html +=  "<tr><td>" + key + "</td><td>" + response[key] + "</td></tr>";
-        }
-        html += "</table>";
-        document.getElementById('status').innerHTML = 'Thanks for logging in, ' + html;
+        console.log('Successful login for: ' + response.name);
+        console.log(response);
     });
   }
+
+$(function () {
+
+    $("#fb-login-button").click(function(){
+        console.log("fb-login-button click");
+        FB.login(function(response) {
+            console.log("fb-login-button response");
+            console.log(response);
+        }, {scope: 'user_friends,public_profile,email,user_place_visits,age_range '});
+
+    });
+    
+});
