@@ -77,7 +77,7 @@
         for(var key in response) { 
             html +=  "<tr><td>" + key + "</td><td>" + response[key] + "</td></tr>";
         }
-        html = "</table>";
+        html += "</table>";
         document.getElementById('status').innerHTML = 'Thanks for logging in, ' + html;
     });
   }
