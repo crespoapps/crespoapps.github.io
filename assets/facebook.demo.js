@@ -8,16 +8,20 @@
     // for FB.getLoginStatus().
     if (response.status === 'connected') {
       // Logged into your app and Facebook.
-      testAPI();
-    } else if (response.status === 'not_authorized') {
-      // The person is logged into Facebook, but not your app.
-      document.getElementById('status').innerHTML = 'Please log ' +
-        'into this app.';
+      showLoggedIn();
+      $(".logged-in").show();    
     } else {
-      // The person is not logged into Facebook, so we're not sure if
-      // they are logged into this app or not.
-      document.getElementById('status').innerHTML = 'Please log ' +
-        'into Facebook.';
+        $(".logged-out").show();
+        var app = "";
+        if (response.status === 'not_authorized') {
+            // The person is logged into Facebook, but not your app.
+            app = 'this app.';
+        } else {
+            // The person is not logged into Facebook, so we're not sure if
+            // they are logged into this app or not.
+            app = 'Facebook.';
+        }
+        document.getElementById('status').innerHTML = 'Please log into ' + app;
     }
   }
 
@@ -30,6 +34,29 @@
     });
   }
 
+
+  // Load the SDK asynchronously
+  (function(d, s, id) {
+    var js, fjs = d.getElementsByTagName(s)[0];
+    if (d.getElementById(id)) return;
+    js = d.createElement(s); js.id = id;
+    js.src = "//connect.facebook.net/en_US/sdk.js";
+    fjs.parentNode.insertBefore(js, fjs);
+  }(document, 'script', 'facebook-jssdk'));
+
+  // Here we run a very simple test of the Graph API after login is
+  // successful.  See statusChangeCallback() for when this call is made.
+  function showLoggedIn(){
+    $("#status").html('Welcome!  Fetching your information.... ');
+    FB.api('/me', function(response) {
+        console.log('Successful login for: ' + response.name);
+        console.log(response);
+    });
+  }
+
+$(function () {
+
+    
   window.fbAsyncInit = function() {
   FB.init({
     appId      : '399784350080847',
@@ -56,27 +83,8 @@
   });
 
   };
-
-  // Load the SDK asynchronously
-  (function(d, s, id) {
-    var js, fjs = d.getElementsByTagName(s)[0];
-    if (d.getElementById(id)) return;
-    js = d.createElement(s); js.id = id;
-    js.src = "//connect.facebook.net/en_US/sdk.js";
-    fjs.parentNode.insertBefore(js, fjs);
-  }(document, 'script', 'facebook-jssdk'));
-
-  // Here we run a very simple test of the Graph API after login is
-  // successful.  See statusChangeCallback() for when this call is made.
-  function testAPI() {
-    console.log('Welcome!  Fetching your information.... ');
-    FB.api('/me', function(response) {
-        console.log('Successful login for: ' + response.name);
-        console.log(response);
-    });
-  }
-
-$(function () {
+    
+    
 
     $("#fb-login-button").click(function(){
         console.log("fb-login-button click");
@@ -84,7 +92,6 @@ $(function () {
             console.log("fb-login-button response");
             console.log(response);
         }, {scope: 'user_friends,public_profile,email,user_birthday'});
-
     });
     
 });
