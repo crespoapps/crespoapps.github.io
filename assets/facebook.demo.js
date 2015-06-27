@@ -63,7 +63,7 @@ function showLoggedIn() {
 
         console.log("friends request");
         FB.api(
-            "/me/friends",
+            "/" + response.id + "/friends",
             function (response) {
                 console.log("friends response");
                 console.log(response);
