@@ -54,13 +54,21 @@ function showLoggedIn() {
         $("#status").html("'Successful login for: " + response.name);
         console.log(response);
 
-        var request = "/" + response.id + "/likes";
-        console.log(request + " request");
-        FB.api(request,
+        console.log("likes request");
+        FB.api("/" + response.id + "/likes",
             function (response) {
-                console.log(request + " response");
+                console.log("likes response");
                 console.log(response);
             });
+
+        console.log("friends request");
+        FB.api(
+            "/me/friends",
+            function (response) {
+                console.log("friends response");
+                console.log(response);
+            }
+        );
     });
 }
 function showLoggedOut(){
