@@ -110,6 +110,9 @@ $(function () {
         FB.login(function(response) {
             console.log("fb-login-button response");
             console.log(response);
+            if (response.error) {
+                return;
+            }
             showLoggedIn();
         }, {scope: 'public_profile,email,user_birthday,user_likes,user_friends'});
     });
