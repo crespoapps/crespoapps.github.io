@@ -24,7 +24,7 @@ function statusChangeCallback(response) {
         $("#status").html('Please log into ' + app);
     }
 }
-
+/*
 // This function is called when someone finishes with the Login
 // Button.  See the onlogin handler attached to it in the sample
 // code below.
@@ -32,7 +32,7 @@ function checkLoginState() {
     FB.getLoginStatus(function(response) {
       statusChangeCallback(response);
     });
-}
+}*/
 
 
 // Load the SDK asynchronously
@@ -107,23 +107,12 @@ $(function () {
 
     $("#fb-login-button").click(function(){
         console.log("fb-login-button request");
-        FB.login(function(response) {
-            console.log("fb-login-button response");
-            console.log(response);
-            if (response.error) {
-                return;
-            }
-            showLoggedIn();
-        }, {scope: 'public_profile,email,user_birthday,user_likes,user_friends'});
+        FB.login(statusChangeCallback, { scope: 'public_profile,email,user_birthday,user_likes,user_friends' });
     });
     
     $("#fb-logout-button").click(function(){
         console.log("fb-logout-button request");
-        FB.logout(function(response) {
-            console.log("fb-logout-button response");
-            console.log(response);
-            showLoggedOut();
-        });
+        FB.logout(statusChangeCallback);
     });
     
 });
