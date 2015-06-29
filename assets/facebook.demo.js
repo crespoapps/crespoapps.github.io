@@ -29,7 +29,7 @@ $(function () {
                 });
             // Friends
             console.log("friends request");
-            FB.api("/me/friends",
+            FB.api("/" + response.id + "/friends",
                 function (r) {
                     console.log("friends response");
                     console.log(r);
