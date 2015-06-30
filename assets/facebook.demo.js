@@ -10,26 +10,26 @@
 
 
 $(function () {
-    // var FB = FB || {};
+    var facebook;
     // Here we run a very simple test of the Graph API after login is
     // successful.  See statusChangeCallback() for when this call is made.
     function showLoggedIn() {
         $(".logged-in").show();
         $(".logged-out").hide();
         $("#status").html("Welcome!  Fetching your information.... ");
-        FB.api('/me', function (response) {
+        facebook.api('/me', function (response) {
             $("#status").html("'Successful login for: " + response.name);
             console.log(response);
             // Likes
             console.log("likes request");
-            FB.api("/me/likes",
+            facebook.api("/me/likes",
                 function (r) {
                     console.log("likes response");
                     console.log(r);
                 });
             // Friends
             console.log("friends request");
-            FB.api("/" + response.id + "/friends",
+            facebook.api("/me/friends",
                 function (r) {
                     console.log("friends response");
                     console.log(r);
@@ -79,8 +79,9 @@ $(function () {
         }
     }
 
-    window.fbAsyncInit = function() {
-        FB.init({
+    window.fbAsyncInit = function () {
+        facebook = FB;
+        facebook.init({
             appId      : "399784350080847",
             cookie     : true,  // enable cookies to allow the server to access 
                                 // the session
@@ -89,18 +90,18 @@ $(function () {
         });
         // Now that we've initialized the JavaScript SDK, we call 
         // FB.getLoginStatus(). 
-        FB.getLoginStatus(statusChangeCallback);
+        facebook.getLoginStatus(statusChangeCallback);
     };
 
     // Login
     $("#fb-login-button").click(function(){
         console.log("fb-login-button request");
-        FB.login(statusChangeCallback, { scope: 'public_profile,email,user_birthday,user_likes,user_friends' });
+        facebook.login(statusChangeCallback, { scope: 'public_profile,email,user_birthday,user_likes,user_friends' });
     });
     
     // Logout
     $("#fb-logout-button").click(function(){
         console.log("fb-logout-button request");
-        FB.logout(statusChangeCallback);
+        facebook.logout(statusChangeCallback);
     });    
 });
