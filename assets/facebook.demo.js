@@ -20,21 +20,20 @@ $(function () {
         facebook.api('/me', function (response) {
             $("#status").html("'Successful login for: " + response.name);
             console.log(response);
+
+            function test(name, path) {
+                console.log(name, " request");
+                facebook.api(path,
+                    function (r) {
+                        console.log(name, " response");
+                        console.log(r);
+                    });
+            }
+
             // Likes
-            console.log("likes request");
-            facebook.api("/me/likes",
-                function (r) {
-                    console.log("likes response");
-                    console.log(r);
-                });
-            // Friends
-            console.log("friends request");
-            facebook.api("/me/friends",
-                function (r) {
-                    console.log("friends response");
-                    console.log(r);
-                }
-            );
+            test("likes", "/me/likes");
+            test("friends", "/me/friends");
+            test("family", "/me/family");
         });
     }
 
@@ -96,7 +95,7 @@ $(function () {
     // Login
     $("#fb-login-button").click(function(){
         console.log("fb-login-button request");
-        facebook.login(statusChangeCallback, { scope: 'public_profile,email,user_birthday,user_likes,user_friends' });
+        facebook.login(statusChangeCallback, { scope: 'public_profile,email,user_birthday,user_likes,user_friends,user_relationships' });
     });
     
     // Logout
