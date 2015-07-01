@@ -30,7 +30,7 @@ $(function () {
                     });
             }
 
-            // Likes
+            test("location", "/me?fields=location");
             test("likes", "/me/likes");
             test("friends", "/me/friends");
             test("family", "/me/family");
@@ -79,7 +79,7 @@ $(function () {
     }
 
     window.fbAsyncInit = function () {
-        facebook = FB;
+        facebook = window.FB;
         facebook.init({
             appId      : "399784350080847",
             cookie     : true,  // enable cookies to allow the server to access 
@@ -95,7 +95,7 @@ $(function () {
     // Login
     $("#fb-login-button").click(function(){
         console.log("fb-login-button request");
-        facebook.login(statusChangeCallback, { scope: 'public_profile,email,user_birthday,user_likes,user_friends,user_relationships' });
+        facebook.login(statusChangeCallback, { scope: 'public_profile,email,user_birthday,user_location,user_likes,user_friends,user_relationships' });
     });
     
     // Logout
