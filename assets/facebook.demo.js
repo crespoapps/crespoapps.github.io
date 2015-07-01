@@ -25,8 +25,7 @@ $(function () {
                 console.log(name, " request");
                 facebook.api(path,
                     function (r) {
-                        console.log(name, " response");
-                        console.log(r);
+                        console.log(name, " response", r);
                     });
             }
 
