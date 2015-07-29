@@ -21,7 +21,7 @@ define(["raphael"], function (raphael) {
                 count = 0;
             }
         }
-        $(".main-row").html(h);
+        $("#container").html(h + "</div>").addClass("links");
 
         function draw(iconArray, transform) {
             var paper = raphael(iconArray);
@@ -33,7 +33,7 @@ define(["raphael"], function (raphael) {
         for (var key in icons) {
             if (icons.hasOwnProperty(key)) {
                 var thumb = icons[key];
-                draw([key, 60, 40].concat(thumb.data), thumb.transform);
+                draw([key, 80, 100].concat(thumb.data), thumb.transform);
             }
         }
     }

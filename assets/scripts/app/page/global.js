@@ -1,5 +1,6 @@
 define([], function () {
     var model = { facebook : {} };
+
     function showLoggedIn(){
       $(".logged-status").hide();
       $(".logged-in").show();
@@ -7,12 +8,11 @@ define([], function () {
           $("#welcome").html("Hi " + response.first_name);
       });
     }
+
     function showLoggedOut(){
       $(".logged-status").hide();
       $(".logged-out").show();
     }
-
-
 
     function load() {
         model.facebook = window.FB;
