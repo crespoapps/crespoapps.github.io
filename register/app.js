@@ -11,7 +11,7 @@
     registerApp.config(["$routeProvider",
     function ($routeProvider) {
 
-        var registerAppRoot = "/Register/Views/";
+        var registerAppRoot = "/register/views/";
 
         $routeProvider.
 	    when("/home", {
