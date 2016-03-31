@@ -66,6 +66,10 @@
 		    templateUrl: registerAppRoot + "confirmation.html",
 		    controller: "confirmationController"
 	    }).
+		when("/error", {
+			templateUrl: registerAppRoot + "error.html",
+			controller: "errorController"
+		}).
 	    otherwise({
 		    redirectTo: "/home"
 	    });
