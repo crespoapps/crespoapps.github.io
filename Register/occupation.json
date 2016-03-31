@@ -1,0 +1,27 @@
+﻿{
+"occupationGroups":[
+	{"name": "Military", "value": 101},
+	{"name": "Government", "value": 102},
+	{"name": "Medical", "value": 103}
+],
+"group101":[
+	{"name": "Army", "value": 201},
+	{"name": "Navy", "value": 201},
+	{"name": "Marines", "value": 201}
+],
+"group102":[
+	{"name": "FBI", "value": 301},
+	{"name": "IRA", "value": 302},
+	{"name": "NASA", "value": 303}
+],
+"group103":[
+	{"name": "EMR", "value": 301},
+	{"name": "Coastal", "value": 302},
+	{"name": "Reserve", "value": 303}
+],
+"occupationStatuses":[
+	{"name": "Active", "value": 401},
+	{"name": "Retired", "value": 402},
+	{"name": "Veteran", "value": 403}
+]
+}
