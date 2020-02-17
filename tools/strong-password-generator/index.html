@@ -16,7 +16,7 @@
     <!-- Custom styles for this template-->
     <link href="/assets/styles/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.1/css/all.css" integrity="sha384-fnmOCqbTlWIlj8LyTjo7mOUStjsKC4pOpQbqyi7RrhN7udi9RwhKkMHpvLbHG9Sr" crossorigin="anonymous">
-    <link href="/assets/styles/app.css?t=SUN16FEB2020040000GMT" rel="stylesheet">
+    <link href="/assets/styles/app.css?t=MON17FEB2020060000GMT" rel="stylesheet">
     <script async src="//pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
     <script async custom-element="amp-auto-ads" src="https://cdn.ampproject.org/v0/amp-auto-ads-0.1.js"></script>
     <script>(adsbygoogle = window.adsbygoogle || []).push({ google_ad_client: "ca-pub-0192003931790683", enable_page_level_ads: true });</script>
@@ -48,24 +48,41 @@
       <script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
     </div>
     <div class="wrappie">
-      <form>
+      <form id="strong-password">
         <div class="container crespo-apps strong-password-generator">
-          <div class="row">
+          <div class="row no-gutters align-items-end">
             <div class="col-md-2">
-              <button class="btn btn-outline-dark" id="submit"><i class="fas fa-key super-icon"></i>Generate</button>
               <div class="form-group">
+                <label for="symbols">Symbols</label>
+                <input class="form-control form-control-lg" id="symbols" type="text" placeholder="~!@#$%+&amp;-_=?" maxlength="18">
+              </div>
+            </div>
+            <div class="col-md-2">
+              <div class="form-group">
+                <label for="size">Size</label>
                 <input class="form-control form-control-lg" id="size" type="number" placeholder="100" maxlength="4" min="8" max="9999">
               </div>
             </div>
-            <div class="col-md-10">
+            <div class="col-md-6">
               <div class="form-group">
-                <textarea class="form-control" id="output" rows="10"></textarea>
+                <label for="output">Secret</label>
+                <div class="input-group">
+                  <input class="form-control form-control-lg" id="output" readonly="readonly">
+                  <div class="input-group-append">
+                    <button class="btn btn-outline-light" id="copy"><i class="fas fa-copy"></i></button>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="col-md-2">
+              <div class="form-group" style="display: flex;justify-content: center;">
+                <button class="btn btn-outline-light" id="submit"><i class="fas fa-key"></i></button>
               </div>
             </div>
           </div>
         </div>
+        <div class="hidden" data-load="password"></div>
       </form>
-      <div class="hidden" data-load="password"></div>
     </div>
     <div class="container crespo-apps">
       <script async src="//pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
@@ -77,10 +94,10 @@
       <div class="container">
         <p class="text-center text-white"><a class="btn btn-outline-secondary" href="https://www.youtube.com/channel/UCVyC2-yL7ZLOL1xqOy2VkXw" target="_blank" role="button"> <i class="super-icon fab fa-youtube"></i></a><a class="btn btn-outline-secondary" href="https://www.instagram.com/crespoapps/" target="_blank" role="button"> <i class="super-icon fab fa-instagram"></i></a><a class="btn btn-outline-secondary" href="https://twitter.com/crespoapps/" target="_blank" role="button"> <i class="super-icon fab fa-twitter"></i></a>
         </p>
-        <p class="text-center text-white crespo-apps">&copy;<span>2020</span>&nbsp;<a href="/">DontBeCrayCray</a>&nbsp;|&nbsp;<a href="/privacy-policy">Privacy Policy</a>&nbsp;|&nbsp;<a href="/sitemap.xml" target="_blank">Sitemap</a><span class="hidden" id="last-updated">Sun, 16 Feb 2020 04:00:00 GMT</span></p>
+        <p class="text-center text-white crespo-apps">&copy;<span>2020</span>&nbsp;<a href="/">DontBeCrayCray</a>&nbsp;|&nbsp;<a href="/privacy-policy">Privacy Policy</a>&nbsp;|&nbsp;<a href="/sitemap.xml" target="_blank">Sitemap</a><span class="hidden" id="last-updated">Mon, 17 Feb 2020 06:00:00 GMT</span></p>
       </div>
     </footer>
     <!-- Scrips-->
-    <script src="/assets/scripts/app.min.js?t=SUN16FEB2020040000GMT"></script>
+    <script src="/assets/scripts/app.min.js?t=MON17FEB2020060000GMT"></script>
   </body>
 </html>
