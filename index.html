@@ -16,7 +16,7 @@
     <!-- Custom styles for this template-->
     <link href="/assets/styles/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.1/css/all.css" integrity="sha384-fnmOCqbTlWIlj8LyTjo7mOUStjsKC4pOpQbqyi7RrhN7udi9RwhKkMHpvLbHG9Sr" crossorigin="anonymous">
-    <link href="/assets/styles/app.css?t=FRI21FEB2020020000GMT" rel="stylesheet">
+    <link href="/assets/styles/app.css?t=THU20FEB2020080000GMT" rel="stylesheet">
     <script async src="//pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
     <script async custom-element="amp-auto-ads" src="https://cdn.ampproject.org/v0/amp-auto-ads-0.1.js"></script>
     <script>(adsbygoogle = window.adsbygoogle || []).push({ google_ad_client: "ca-pub-0192003931790683", enable_page_level_ads: true });</script>
@@ -270,25 +270,45 @@
             <div class="badge badge-pill badge-primary" role="alert">年</div>
           </div>
         </div>
-        <div class="row">
-          <div class="col-md-12">
-            <button class="btn btn-primary" id="pop-button" type="button" data-toggle="modal" data-target="pop-modal">Test</button>
+        <div class="row crespo-links">
+          <div class="col-md-3 crespo-apps" id="pop-button" type="button" data-toggle="modal" data-target="pop-modal">
+            <button class="btn btn-outline-light"><span class="super-icon"><i class="far fa-bell"></i></span><br><span id="pop-label">Alarm</span></button>
           </div>
+          <div class="col-md-3">&nbsp;</div>
+          <div class="col-md-3">&nbsp;</div>
+          <div class="col-md-3">&nbsp;</div>
         </div>
       </div>
       <div class="modal fade" id="pop-modal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
         <div class="modal-dialog" role="document">
           <div class="modal-content">
             <div class="modal-header">
-              <h5 class="modal-title">H2O</h5>
-              <button class="close" type="button" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+              <h5 class="modal-title"><i class="far fa-bell"></i></h5>
+              <button class="close" id="pop-close" type="button" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
             </div>
             <div class="modal-body">
-              <p class="super-icon"><i class="far fa-bell" id="pop-icon"></i></p>
+              <div class="container crespo-apps">
+                <div class="row">
+                  <div class="col-md-6">
+                    <p class="super-icon"><i class="far fa-bell" id="pop-icon"></i></p>
+                  </div>
+                  <div class="col-md-6">
+                    <div class="form-group">
+                      <label for="pop-mins"><i class="far fa-bell"> </i>&nbsp;again in....</label>
+                      <div class="input-group">
+                        <input class="form-control form-control-lg" id="pop-mins" type="number" placeholder="10" maxlength="3" min="1" max="999">
+                        <div class="input-group-append">
+                          <div class="input-group-text">minutes</div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
             </div>
             <div class="modal-footer">
-              <button class="btn btn-primary" type="button" data-dismiss="modal">Ok</button>
-              <button class="btn btn-secondary" type="button" data-dismiss="modal">Close</button>
+              <button class="btn btn-primary" id="pop-ok" type="button" data-dismiss="modal">OK</button>
+              <button class="btn btn-secondary" id="pop-cancel" type="button" data-dismiss="modal">Cancel</button>
             </div>
           </div>
         </div>
