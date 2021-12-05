@@ -1,0 +1,4 @@
+This is a Brave Rewards publisher verification file.
+
+Domain: crespoapps.github.io
+Token: 4420b62de63fd1ea246f6c9636040e111fd1f05df19b802f3ffa1c6342c30c09
