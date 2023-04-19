@@ -1,13 +1,33 @@
 {
   "files": {
     "main.css": "/static/css/main.e6c13ad2.css",
-    "main.js": "/static/js/main.0815715e.js",
+    "main.js": "/static/js/main.b5aac041.js",
+    "static/media/homedepot.svg": "/static/media/homedepot.79e70bfdb1c54adf42f2c114d6a6fab4.svg",
+    "static/media/costco.svg": "/static/media/costco.6a6e7a8c7d86afa7457862ecadecbab9.svg",
+    "static/media/whatsapp.svg": "/static/media/whatsapp.dddfb0ae8b1af7faf2aedab56c4cabd7.svg",
+    "static/media/azure.svg": "/static/media/azure.a94d1766a66cec55315a47031f6088b5.svg",
+    "static/media/ally.svg": "/static/media/ally.82e16aba1a64f57f477ce1588172851e.svg",
+    "static/media/airbnb.svg": "/static/media/airbnb.803a645a7a3572a2dd10861e9de8d4ed.svg",
+    "static/media/amazon.svg": "/static/media/amazon.88fa158bc0a589c33efb2100b7d934a0.svg",
+    "static/media/robinhood.svg": "/static/media/robinhood.09b87c688421f6d2c2ae9eb6efe4c0e1.svg",
+    "static/media/paypal.svg": "/static/media/paypal.0efed7eb297f6c498748505ab55921d6.svg",
+    "static/media/chase.svg": "/static/media/chase.0dc67c936ded6c04e884587ce2a37feb.svg",
+    "static/media/ebay.svg": "/static/media/ebay.62b2e16993650e180a56b539270e56bc.svg",
+    "static/media/github.svg": "/static/media/github.d7b4ed7bde7583b6050113d9e1eebc32.svg",
+    "static/media/calendar.svg": "/static/media/calendar.b948a3da2cf09c08c44ea8b07d048f03.svg",
+    "static/media/youtube.svg": "/static/media/youtube.e07de2e97a93464e43d573e089a1d45a.svg",
+    "static/media/drive.svg": "/static/media/drive.19b63ac0e807243e31ce05b32f15b780.svg",
+    "static/media/citi.svg": "/static/media/citi.a5f91151b3b755bc1afe77ebf0f5eb0e.svg",
+    "static/media/netflix.svg": "/static/media/netflix.27bf381796de59d84e7d369c57a34d95.svg",
+    "static/media/maps.svg": "/static/media/maps.6123de1a2ac8467285682edc71bc4cd8.svg",
     "index.html": "/index.html",
+    "static/media/hulu.svg": "/static/media/hulu.f7e2022c4f9751c17fcefffbca8c3544.svg",
+    "static/media/gmail.svg": "/static/media/gmail.424bbe81b32f170e75818c4eea9c012e.svg",
     "main.e6c13ad2.css.map": "/static/css/main.e6c13ad2.css.map",
-    "main.0815715e.js.map": "/static/js/main.0815715e.js.map"
+    "main.b5aac041.js.map": "/static/js/main.b5aac041.js.map"
   },
   "entrypoints": [
     "static/css/main.e6c13ad2.css",
-    "static/js/main.0815715e.js"
+    "static/js/main.b5aac041.js"
   ]
 }

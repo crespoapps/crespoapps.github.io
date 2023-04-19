@@ -1,5 +1,5 @@
 import React, { useState } from 'react'
-//import { connect } from 'react-redux'
+import { styled } from '@mui/material/styles';
 import AppBar from '@mui/material/AppBar'
 import Box from '@mui/material/Box'
 import Toolbar from '@mui/material/Toolbar'
@@ -13,10 +13,32 @@ import Button from '@mui/material/Button'
 import Tooltip from '@mui/material/Tooltip'
 import MenuItem from '@mui/material/MenuItem'
 import AdbIcon from '@mui/icons-material/Adb'
+import { Link } from 'react-router-dom'
 
 const settings = ['Profile', 'Account', 'Dashboard', 'Logout']
 
-const Head = ({ pages, onPageChange }) => {
+const getPath = (page) => {
+    switch (page) {
+        case 'Keyz': return '/tools/strong-password-generator'
+        case 'Linx': return '/links'
+        case 'Vidz': return '/videos'
+        default: return null
+    }
+}
+
+const StyledLink = styled(Link)(({ theme }) => ({
+    color: 'White',
+    textDecoration: 'none'
+}));
+
+const HeadLink = ({ page }) => (
+    <StyledLink to={getPath(page)}>
+        {page}
+    </StyledLink>)
+
+const Head = () => {
+    const pages = ['Keyz', 'Linx', 'Vidz']
+
     const [anchorElNav, setAnchorElNav] = useState(null)
     const [anchorElUser, setAnchorElUser] = useState(null)
 
@@ -25,11 +47,6 @@ const Head = ({ pages, onPageChange }) => {
     }
     const handleOpenUserMenu = (event) => {
         setAnchorElUser(event.currentTarget)
-    }
-
-    const handlePageSelection = (page) => {
-        onPageChange(page)
-        setAnchorElNav(null)
     }
 
     const handleCloseNavMenu = () => {
@@ -48,8 +65,6 @@ const Head = ({ pages, onPageChange }) => {
                     <Typography
                         variant="h6"
                         noWrap
-                        component="a"
-                        href="/"
                         sx={{
                             mr: 2,
                             display: { xs: 'none', md: 'flex' },
@@ -59,7 +74,9 @@ const Head = ({ pages, onPageChange }) => {
                             textDecoration: 'none',
                         }}
                     >
-                        Crespo Apps
+                        <StyledLink to="/">
+                            Crespo Apps
+                        </StyledLink>
                     </Typography>
 
                     <Box sx={{ flexGrow: 1, display: { xs: 'flex', md: 'none' } }}>
@@ -92,8 +109,10 @@ const Head = ({ pages, onPageChange }) => {
                             }}
                         >
                             {pages.map((page) => (
-                                <MenuItem key={page} onClick={() => handlePageSelection(page)}>
-                                    <Typography textAlign="center">{page}</Typography>
+                                <MenuItem key={page}>
+                                    <Typography textAlign="center">
+                                        <HeadLink page={page} />
+                                    </Typography>
                                 </MenuItem>
                             ))}
                         </Menu>
@@ -102,8 +121,6 @@ const Head = ({ pages, onPageChange }) => {
                     <Typography
                         variant="h5"
                         noWrap
-                        component="a"
-                        href=""
                         sx={{
                             mr: 2,
                             display: { xs: 'flex', md: 'none' },
@@ -115,16 +132,18 @@ const Head = ({ pages, onPageChange }) => {
                             textDecoration: 'none',
                         }}
                     >
-                        Crespo Apps
+                        <StyledLink to="/">
+                            Crespo Apps
+                        </StyledLink>
                     </Typography>
                     <Box sx={{ flexGrow: 1, display: { xs: 'none', md: 'flex' } }}>
                         {pages.map((page) => (
                             <Button
                                 key={page}
-                                onClick={() => handlePageSelection(page)}
+
                                 sx={{ my: 2, color: 'white', display: 'block' }}
                             >
-                                {page}
+                                <HeadLink page={page} />
                             </Button>
                         ))}
                     </Box>
