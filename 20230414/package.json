@@ -20,6 +20,7 @@
     "redux-thunk": "2.4.2"
   },
   "scripts": {
+    "serve": "serve -s ../docs",
     "start": "react-scripts start",
     "build": "BUILD_PATH='../docs' react-scripts build",
     "test": "react-scripts test",
@@ -42,5 +43,8 @@
       "last 1 firefox version",
       "last 1 safari version"
     ]
+  },
+  "devDependencies": {
+    "serve": "14.2.0"
   }
 }
