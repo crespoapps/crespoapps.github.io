@@ -2,8 +2,9 @@ import React from 'react'
 import Head from './components/Head'
 import Body from './components/Body'
 import Foot from './components/Foot'
+import { redirect } from 'react-router-dom'
 
-const App = () => (
+const AppContent = () => (
   <>
     <Head />
     <Body />
@@ -11,4 +12,11 @@ const App = () => (
   </>
 )
 
+const App = ({ start }) => {
+  if (!start) {
+    return <AppContent />
+  }
+  redirect(`/${start}`)
+  return null
+}
 export default App
