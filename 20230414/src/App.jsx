@@ -16,7 +16,8 @@ const App = ({ start }) => {
   if (!start) {
     return <AppContent />
   }
-  redirect(`/${start}`)
+
+  redirect(`/${start.substring(0, start.length - 1)}`)
   return null
 }
 export default App
