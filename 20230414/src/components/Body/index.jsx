@@ -1,10 +1,9 @@
 import React from 'react'
 import { Routes, Route } from 'react-router-dom'
+import Home from './Home'
 import Keyz from './Keyz'
 import Linx from './Linx'
 import Vidz from './Vidz'
-
-const Home = () => <div>Hi</div>
 
 const Body = () => (
     <Routes>

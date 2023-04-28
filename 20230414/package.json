@@ -5,6 +5,8 @@
   "dependencies": {
     "@emotion/react": "11.10.6",
     "@emotion/styled": "11.10.6",
+    "@ffmpeg/core": "0.11.0",
+    "@ffmpeg/ffmpeg": "0.11.6",
     "@mui/icons-material": "5.11.16",
     "@mui/material": "5.12.0",
     "@reduxjs/toolkit": "1.9.3",
@@ -17,7 +19,8 @@
     "react-router-dom": "6.10.0",
     "react-scripts": "5.0.1",
     "redux": "4.2.1",
-    "redux-thunk": "2.4.2"
+    "redux-thunk": "2.4.2",
+    "three": "^0.152.0"
   },
   "scripts": {
     "serve": "serve -s ../docs",

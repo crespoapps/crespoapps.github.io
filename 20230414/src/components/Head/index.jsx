@@ -12,7 +12,10 @@ import Avatar from '@mui/material/Avatar'
 import Button from '@mui/material/Button'
 import Tooltip from '@mui/material/Tooltip'
 import MenuItem from '@mui/material/MenuItem'
-import AdbIcon from '@mui/icons-material/Adb'
+import AllInclusiveIcon from '@mui/icons-material/AllInclusive'
+import BiotechIcon from '@mui/icons-material/Biotech'
+import SavingsIcon from '@mui/icons-material/Savings'
+import ScienceIcon from '@mui/icons-material/Science'
 import { Link } from 'react-router-dom'
 
 const settings = ['Profile', 'Account', 'Dashboard', 'Logout']
@@ -29,7 +32,15 @@ const getPath = (page) => {
 const StyledLink = styled(Link)(({ theme }) => ({
     color: 'White',
     textDecoration: 'none'
-}));
+}))
+
+const SiteIcon = ({ sx }) => ({
+    '0': <AllInclusiveIcon sx={sx} />,
+    '1': <BiotechIcon sx={sx} />,
+    '2': <SavingsIcon sx={sx} />,
+    '3': <ScienceIcon sx={sx} />,
+})['' + ((new Date()).getSeconds() % 4)]
+
 
 const HeadLink = ({ page }) => (
     <StyledLink to={getPath(page)}>
@@ -61,7 +72,7 @@ const Head = () => {
         <AppBar position="static">
             <Container maxWidth="xl">
                 <Toolbar disableGutters>
-                    <AdbIcon sx={{ display: { xs: 'none', md: 'flex' }, mr: 1 }} />
+                    <SiteIcon sx={{ display: { xs: 'none', md: 'flex' }, mr: 1 }} />
                     <Typography
                         variant="h6"
                         noWrap
@@ -117,7 +128,7 @@ const Head = () => {
                             ))}
                         </Menu>
                     </Box>
-                    <AdbIcon sx={{ display: { xs: 'flex', md: 'none' }, mr: 1 }} />
+                    <SiteIcon sx={{ display: { xs: 'flex', md: 'none' }, mr: 1 }} />
                     <Typography
                         variant="h5"
                         noWrap
