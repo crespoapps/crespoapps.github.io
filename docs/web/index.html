@@ -3,24 +3,30 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AI Lens Studio | Final Fix</title>
+    <title>AI Lens Studio | Production Ready</title>
     
     <script src="https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@0.10.3"></script>
 
     <style>
         :root { --accent: #00d2ff; --glass: rgba(0,0,0,0.85); --red: #ff4757; }
-        body, html { margin: 0; padding: 0; width: 100%; height: 100%; overflow: hidden; background: #000; font-family: 'Segoe UI', system-ui, sans-serif; color: white; }
+        body, html { margin: 0; padding: 0; width: 100%; height: 100%; overflow: hidden; background: #000; font-family: 'Segoe UI', sans-serif; color: white; }
         
         #mainCanvas { width: 100vw; height: 100vh; object-fit: cover; display: block; }
         video { display: none; }
 
-        #flash { position: fixed; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 2000; }
-        .flash-active { background: white; animation: fadeOut 0.4s forwards; }
-        @keyframes fadeOut { from { opacity: 1; } to { opacity: 0; } }
-        
-        #countdown { position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); font-size: 12rem; font-weight: 900; z-index: 1500; text-shadow: 0 0 30px #000; pointer-events: none; }
+        /* Initial Loader */
+        #loader { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #000; z-index: 5000; display: flex; flex-direction: column; align-items: center; justify-content: center; transition: opacity 0.5s; }
+        .spinner { width: 50px; height: 50px; border: 5px solid rgba(255,255,255,0.1); border-top-color: var(--accent); border-radius: 50%; animation: spin 1s linear infinite; }
+        @keyframes spin { to { transform: rotate(360deg); } }
 
-        .ui-el { transition: all 0.3s ease; z-index: 1000; }
+        /* Effects Overlays */
+        #flash { position: fixed; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 2000; }
+        .flash-active { background: white; animation: fade 0.4s forwards; }
+        @keyframes fade { from { opacity: 1; } to { opacity: 0; } }
+        #countdown { position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); font-size: 10rem; font-weight: 900; z-index: 1500; text-shadow: 0 0 30px #000; pointer-events: none; }
+
+        /* UI Containers */
+        .ui-el { transition: 0.3s ease; z-index: 1000; }
         .hidden { opacity: 0; pointer-events: none; transform: translateY(20px); }
 
         .toolbar { 
@@ -29,37 +35,40 @@
             background: var(--glass); backdrop-filter: blur(20px); border: 1px solid rgba(255,255,255,0.1);
         }
 
-        .side-bar { 
-            position: fixed; top: 20px; right: 20px; width: 120px; height: 85vh; 
-            overflow-y: auto; display: flex; flex-direction: column; gap: 10px; scrollbar-width: none;
-        }
+        .side-bar { position: fixed; top: 20px; right: 20px; width: 120px; height: 85vh; overflow-y: auto; display: flex; flex-direction: column; gap: 10px; scrollbar-width: none; }
         .gallery-item { width: 100%; border-radius: 10px; border: 2px solid rgba(255,255,255,0.2); cursor: pointer; background: #111; }
-
+        
+        #status-bar { position: fixed; top: 20px; left: 80px; background: var(--glass); padding: 5px 12px; border-radius: 20px; font-size: 12px; font-family: monospace; border: 1px solid rgba(255,255,255,0.1); color: #0f0; }
         #toggle-ui { position: fixed; top: 20px; left: 20px; width: 45px; height: 45px; background: var(--glass); border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; border: 1px solid rgba(255,255,255,0.2); }
 
-        button, label, input { padding: 10px 16px; border-radius: 20px; border: none; font-weight: bold; cursor: pointer; background: #333; color: white; transition: 0.2s; font-size: 13px; }
+        button, label, input { padding: 10px 16px; border-radius: 20px; border: none; font-weight: bold; cursor: pointer; background: #333; color: white; transition: 0.2s; font-size: 12px; outline: none; }
         button:hover { background: var(--accent); color: #000; }
         .btn-snap { background: var(--red); }
-        #meme-box { background: rgba(255,255,255,0.1); width: 120px; border: 1px solid rgba(255,255,255,0.2); }
     </style>
 </head>
 <body>
 
+    <div id="loader">
+        <div class="spinner"></div>
+        <p style="margin-top:20px; letter-spacing: 2px;">SYNCING AI ENGINE...</p>
+    </div>
+
     <div id="flash"></div>
     <div id="countdown"></div>
     <div id="toggle-ui" onclick="document.querySelectorAll('.ui-el').forEach(e=>e.classList.toggle('hidden'))">👁️</div>
+    <div id="status-bar" class="ui-el">FPS: <span id="fps">0</span></div>
 
     <canvas id="mainCanvas"></canvas>
     <video id="video" autoplay playsinline></video>
 
     <div class="toolbar ui-el">
         <button onclick="f='none'">Pure</button>
-        <button onclick="f='beauty'">✨</button>
-        <button onclick="f='neon'">⚡</button>
-        <button onclick="f='distort'">🌀</button>
+        <button onclick="f='beauty'">✨ Beauty</button>
+        <button onclick="f='neon'">⚡ Neon</button>
+        <button onclick="f='distort'">🌀 Bubble</button>
         <button onclick="sMode='dog'">🐶</button>
         <button onclick="sMode='sunglasses'">🕶️</button>
-        <input type="text" id="meme-box" placeholder="Meme..." oninput="mText=this.value.toUpperCase()">
+        <input type="text" placeholder="CAPTION..." oninput="mText=this.value.toUpperCase()" style="width:100px; background:rgba(255,255,255,0.1)">
         <button class="btn-snap" onclick="snap()">📸</button>
         <button style="background:#ffa502" id="recBtn" onclick="record()">🎥</button>
         <label>🖼️<input type="file" hidden onchange="loadBG(event)"></label>
@@ -70,40 +79,59 @@
     <script>
         const canvas = document.getElementById('mainCanvas'), ctx = canvas.getContext('2d', { willReadFrequently: true });
         const video = document.getElementById('video'), shutter = new Audio('https://www.soundjay.com/mechanical/camera-shutter-click-08.mp3');
-        let f='none', sMode='sunglasses', mText="", bgImg=null, faceLandmarker=null;
+        let f='none', sMode='sunglasses', mText="", bgImg=null, faceLandmarker=null, lastTime = 0;
         
-        // Assets
-        const stickerS = new Image(); stickerS.src = 'https://i.imgur.com/39A4D3m.png';
+        const stickS = new Image(); stickS.src = 'https://i.imgur.com/39A4D3m.png';
         const earL = new Image(); earL.src = 'https://i.imgur.com/vS3Q9R5.png';
         const earR = new Image(); earR.src = 'https://i.imgur.com/uR3V5fS.png';
 
-        async function setupAI() {
-            const vision = await mediapipe.tasks.vision.FilesetResolver.forVisionTasks("https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@0.10.3/wasm");
-            faceLandmarker = await mediapipe.tasks.vision.FaceLandmarker.createFromOptions(vision, {
-                baseOptions: { modelAssetPath: `https://storage.googleapis.com/mediapipe-models/face_landmarker/face_landmarker/float16/1/face_landmarker.task`, delegate: "GPU" },
-                runningMode: "VIDEO", numFaces: 1
-            });
-            startCamera();
+        async function init() {
+            try {
+                // Namespace fix for MediaPipe Tasks Vision
+                const vision = window.tasksVision;
+                const fileset = await vision.FilesetResolver.forVisionTasks("https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@0.10.3/wasm");
+                faceLandmarker = await vision.FaceLandmarker.createFromOptions(fileset, {
+                    baseOptions: { modelAssetPath: `https://storage.googleapis.com/mediapipe-models/face_landmarker/face_landmarker/float16/1/face_landmarker.task`, delegate: "GPU" },
+                    runningMode: "VIDEO", numFaces: 1
+                });
+
+                const stream = await navigator.mediaDevices.getUserMedia({ video: { width: 1280, height: 720 } });
+                video.srcObject = stream;
+                
+                video.onloadeddata = () => {
+                    document.getElementById('loader').style.opacity = '0';
+                    setTimeout(() => document.getElementById('loader').remove(), 500);
+                    window.onresize = () => { canvas.width = window.innerWidth; canvas.height = window.innerHeight; };
+                    window.onresize();
+                    requestAnimationFrame(render);
+                };
+            } catch (e) {
+                document.querySelector('#loader p').innerText = "ERROR: Use HTTPS/Localhost";
+                console.error("Initialization Failed:", e);
+            }
         }
 
-        async function startCamera() {
-            const stream = await navigator.mediaDevices.getUserMedia({ video: { width: 1280, height: 720 } });
-            video.srcObject = stream;
-            window.onresize = () => { canvas.width = window.innerWidth; canvas.height = window.innerHeight; };
-            window.onresize();
-            requestAnimationFrame(render);
+        function loadBG(e) { 
+            const r = new FileReader(); 
+            r.onload = v => { bgImg = new Image(); bgImg.src = v.target.result; }; 
+            r.readAsDataURL(e.target.files[0]); 
         }
 
-        function loadBG(e) { const r = new FileReader(); r.onload=v=>{bgImg=new Image(); bgImg.src=v.target.result;}; r.readAsDataURL(e.target.files[0]); }
+        function render(now) {
+            // FPS Calculation
+            if (lastTime) {
+                const fps = Math.round(1000 / (now - lastTime));
+                if (Math.random() > 0.9) document.getElementById('fps').innerText = fps;
+            }
+            lastTime = now;
 
-        function render() {
-            // Draw Background
+            // 1. Draw Background or Black Base
             if(bgImg) {
                 const sc = Math.max(canvas.width/bgImg.width, canvas.height/bgImg.height);
                 ctx.drawImage(bgImg, (canvas.width-bgImg.width*sc)/2, (canvas.height-bgImg.height*sc)/2, bgImg.width*sc, bgImg.height*sc);
             } else { ctx.fillStyle='#000'; ctx.fillRect(0,0,canvas.width,canvas.height); }
 
-            // Mirror Logic
+            // 2. Mirror/Composition Prep
             const vSc = Math.max(canvas.width/video.videoWidth, canvas.height/video.videoHeight);
             const vW = video.videoWidth*vSc, vH = video.videoHeight*vSc;
             const vX = (canvas.width-vW)/2, vY = (canvas.height-vH)/2;
@@ -111,66 +139,80 @@
             ctx.save();
             ctx.translate(canvas.width, 0); ctx.scale(-1, 1);
             
-            // Chroma Key Processing (if BG exists)
             if(bgImg) {
-                const offscreen = new OffscreenCanvas(canvas.width, canvas.height);
-                const oCtx = offscreen.getContext('2d');
-                oCtx.drawImage(video, (canvas.width-vW)/2, vY, vW, vH);
-                let d = oCtx.getImageData(0,0,canvas.width,canvas.height);
-                for(let i=0; i<d.data.length; i+=4) if(d.data[i+1]>95 && d.data[i+1]>d.data[i]*1.3) d.data[i+3]=0;
-                oCtx.putImageData(d,0,0);
-                ctx.drawImage(offscreen, 0, 0);
+                const off = new OffscreenCanvas(canvas.width, canvas.height);
+                const ox = off.getContext('2d');
+                ox.drawImage(video, (canvas.width-vW)/2, vY, vW, vH);
+                let d = ox.getImageData(0,0,canvas.width,canvas.height);
+                for(let i=0; i<d.data.length; i+=4) if(d.data[i+1]>90 && d.data[i+1]>d.data[i]*1.25) d.data[i+3]=0;
+                ox.putImageData(d,0,0);
+                ctx.drawImage(off, 0, 0);
             } else {
                 ctx.drawImage(video, vX, vY, vW, vH);
             }
             ctx.restore();
 
-            // Post-Processing Filters
+            // 3. Image Post-Processing Filters
             if(f==='beauty') {
-                ctx.globalAlpha=0.35; ctx.filter='blur(4px) saturate(1.1)'; 
-                ctx.drawImage(canvas, 0, 0); ctx.globalAlpha=1.0; ctx.filter='none';
-            } else if(f !== 'none' && f !== 'distort' && f !== 'neon') {
-                ctx.filter = f; ctx.drawImage(canvas, 0, 0); ctx.filter = 'none';
+                ctx.globalAlpha=0.3; ctx.filter='blur(4px) saturate(1.1)'; ctx.drawImage(canvas, 0, 0); ctx.globalAlpha=1; ctx.filter='none';
+            } else if(f==='neon') {
+                let d=ctx.getImageData(0,0,canvas.width,canvas.height);
+                for(let i=0;i<d.data.length;i+=4){ let df=Math.abs(d.data[i]-d.data[i+4]); d.data[i]=0; d.data[i+1]=df>30?255:0; d.data[i+2]=df>30?255:0; d.data[i+3]=255; }
+                ctx.putImageData(d,0,0);
+            } else if(f!=='none' && f!=='distort') {
+                ctx.filter=f; ctx.drawImage(canvas, 0, 0); ctx.filter='none';
             }
 
-            // AI Features
-            if (faceLandmarker && video.readyState >= 2) {
-                const results = faceLandmarker.detectForVideo(video, performance.now());
-                if (results.faceLandmarks.length > 0) {
-                    const k = results.faceLandmarks[0];
-                    const mapX = (x) => canvas.width - ((x * video.videoWidth * vSc) + vX);
-                    const mapY = (y) => (y * video.videoHeight * vSc) + vY;
+            // 4. AI AR Tracking
+            if(faceLandmarker && video.readyState >= 2) {
+                const res = faceLandmarker.detectForVideo(video, now);
+                if(res.faceLandmarks.length > 0) {
+                    const k = res.faceLandmarks[0];
+                    const mX = (x) => canvas.width - ((x * video.videoWidth * vSc) + vX);
+                    const mY = (y) => (y * video.videoHeight * vSc) + vY;
                     
-                    const nose = k[1], lE = k[33], rE = k[263];
-                    const fX = mapX(nose.x), fY = mapY(nose.y);
-                    const size = Math.abs(mapX(rE.x) - mapX(lE.x)) * 2.5;
+                    const nose = k[1], lE = k[33], rE = k[263], fX = mX(nose.x), fY = mY(nose.y);
 
-                    if(sMode==='sunglasses') ctx.drawImage(stickerS, fX-size/2, fY-size/4, size, size/2);
+                    if(f==='distort') {
+                        const r=150, img=ctx.getImageData(fX-r,fY-r,r*2,r*2), out=ctx.createImageData(r*2,r*2);
+                        for(let y=0;y<r*2;y++) for(let x=0;x<r*2;x++){
+                            const dx=x-r, dy=y-r, d=Math.sqrt(dx*dx+dy*dy);
+                            if(d<r){ const p=Math.pow(d/r,0.6), sx=Math.round(r+dx*p), sy=Math.round(r+dy*p), i=(y*r*2+x)*4, si=(sy*r*2+sx)*4; for(let j=0;j<4;j++) out.data[i+j]=img.data[si+j]; }
+                        }
+                        ctx.putImageData(out, fX-r, fY-r);
+                    }
+                    
+                    const size = Math.abs(mX(rE.x)-mX(lE.x))*2.5;
+                    if(sMode==='sunglasses') ctx.drawImage(stickS, fX-size/2, fY-size/4, size, size/2);
                     else {
-                        const eSize = size*0.8;
-                        ctx.drawImage(earL, mapX(k[103].x)-eSize/2, mapY(k[103].y)-eSize, eSize, eSize);
-                        ctx.drawImage(earR, mapX(k[332].x)-eSize/2, mapY(k[332].y)-eSize, eSize, eSize);
+                        const eS = size*0.8;
+                        ctx.drawImage(earL, mX(k[103].x)-eS/2, mY(k[103].y)-eS, eS, eS);
+                        ctx.drawImage(earR, mX(k[332].x)-eS/2, mY(k[332].y)-eS, eS, eS);
                     }
                 }
             }
 
-            if(mText) {
-                ctx.font=`bold ${canvas.width/15}px Impact`; ctx.textAlign='center'; ctx.fillStyle='white';
-                ctx.strokeStyle='black'; ctx.lineWidth=3;
-                ctx.strokeText(mText, canvas.width/2, canvas.height-50);
-                ctx.fillText(mText, canvas.width/2, canvas.height-50);
+            // 5. Meme Text Rendering
+            if (mText) { 
+                ctx.font = `bold ${canvas.width / 15}px Impact`; 
+                ctx.textAlign = 'center'; 
+                ctx.fillStyle = 'white'; 
+                ctx.strokeStyle = 'black'; 
+                ctx.lineWidth = 3; 
+                ctx.strokeText(mText, canvas.width / 2, canvas.height - 50); 
+                ctx.fillText(mText, canvas.width / 2, canvas.height - 50); 
             }
-
+            
             requestAnimationFrame(render);
         }
 
+        // Action Functions
         function snap() {
             let s=3; const el=document.getElementById('countdown');
             const i = setInterval(() => {
                 el.innerText = s||"📸";
-                if(s<0) { 
-                    clearInterval(i); el.innerText=""; shutter.play(); 
-                    document.getElementById('flash').classList.add('flash-active');
+                if(s<0){ 
+                    clearInterval(i); el.innerText=""; shutter.play(); document.getElementById('flash').classList.add('flash-active');
                     setTimeout(()=>document.getElementById('flash').classList.remove('flash-active'),150);
                     save(canvas.toDataURL(), 'img'); 
                 }
@@ -184,18 +226,18 @@
             rec.ondataavailable = e => chunks.push(e.data);
             rec.onstop = () => { 
                 const url = URL.createObjectURL(new Blob(chunks, {type:'video/webm'}));
-                save(url, 'video'); btn.disabled=false;
+                save(url, 'video'); btn.disabled=false; 
             };
             rec.start(); setTimeout(() => rec.stop(), 5000);
         }
 
         function save(src, type) {
             const el = document.createElement(type); el.src=src; el.className='gallery-item'; if(type==='video') el.controls=true;
-            el.onclick=()=>{ const a = document.createElement('a'); a.href=src; a.download=`AI-Lens-${Date.now()}`; a.click(); };
+            el.onclick=()=>{ const a=document.createElement('a'); a.href=src; a.download=`Studio-Export-${Date.now()}`; a.click(); };
             document.getElementById('gallery').prepend(el);
         }
 
-        setupAI();
+        init();
     </script>
 </body>
 </html>
