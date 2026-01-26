@@ -3,201 +3,199 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AI Lens Studio | Production</title>
+    <title>AI Lens Studio | Final Fix</title>
     
-    <script src="https://cdn.jsdelivr.net/npm/@mediapipe/face_mesh"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs-core"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs-converter"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs-backend-webgl"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@tensorflow-models/face-landmarks-detection"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@0.10.3"></script>
 
     <style>
-        :root { --accent: #00d2ff; --glass: rgba(0,0,0,0.8); }
+        :root { --accent: #00d2ff; --glass: rgba(0,0,0,0.85); --red: #ff4757; }
         body, html { margin: 0; padding: 0; width: 100%; height: 100%; overflow: hidden; background: #000; font-family: 'Segoe UI', system-ui, sans-serif; color: white; }
         
         #mainCanvas { width: 100vw; height: 100vh; object-fit: cover; display: block; }
         video { display: none; }
 
-        /* Overlays */
-        #flash-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 1000; transition: background 0.1s; }
-        .flash-active { background: white !important; }
-        #countdown { position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); font-size: 12rem; font-weight: 900; pointer-events: none; z-index: 500; text-shadow: 0 0 40px rgba(0,0,0,0.9); }
+        #flash { position: fixed; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 2000; }
+        .flash-active { background: white; animation: fadeOut 0.4s forwards; }
+        @keyframes fadeOut { from { opacity: 1; } to { opacity: 0; } }
+        
+        #countdown { position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); font-size: 12rem; font-weight: 900; z-index: 1500; text-shadow: 0 0 30px #000; pointer-events: none; }
 
-        /* UI Toggle & Elements */
-        .ui-element { transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); z-index: 100; }
-        .ui-hidden { opacity: 0 !important; pointer-events: none; transform: scale(0.9) translateY(20px); }
+        .ui-el { transition: all 0.3s ease; z-index: 1000; }
+        .hidden { opacity: 0; pointer-events: none; transform: translateY(20px); }
 
-        #toggle-ui { position: fixed; top: 20px; left: 20px; width: 45px; height: 45px; background: var(--glass); border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; border: 1px solid rgba(255,255,255,0.2); z-index: 1000; }
-
-        .controls { 
-            position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%); 
-            display: flex; gap: 10px; padding: 12px 20px; border-radius: 50px; 
+        .toolbar { 
+            position: fixed; bottom: 25px; left: 50%; transform: translateX(-50%); 
+            display: flex; gap: 8px; padding: 12px 20px; border-radius: 50px; 
             background: var(--glass); backdrop-filter: blur(20px); border: 1px solid rgba(255,255,255,0.1);
         }
 
-        .gallery-bar { position: fixed; top: 20px; right: 20px; width: 130px; height: 85vh; overflow-y: auto; display: flex; flex-direction: column; gap: 12px; padding: 5px; scrollbar-width: none; }
-        .gallery-item { width: 100%; border-radius: 8px; border: 2px solid rgba(255,255,255,0.3); cursor: pointer; transition: transform 0.2s; }
-        .gallery-item:hover { transform: scale(1.05); border-color: var(--accent); }
+        .side-bar { 
+            position: fixed; top: 20px; right: 20px; width: 120px; height: 85vh; 
+            overflow-y: auto; display: flex; flex-direction: column; gap: 10px; scrollbar-width: none;
+        }
+        .gallery-item { width: 100%; border-radius: 10px; border: 2px solid rgba(255,255,255,0.2); cursor: pointer; background: #111; }
 
-        button, label, input { padding: 10px 18px; border-radius: 20px; border: none; font-weight: bold; cursor: pointer; background: #333; color: white; transition: 0.2s; }
+        #toggle-ui { position: fixed; top: 20px; left: 20px; width: 45px; height: 45px; background: var(--glass); border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; border: 1px solid rgba(255,255,255,0.2); }
+
+        button, label, input { padding: 10px 16px; border-radius: 20px; border: none; font-weight: bold; cursor: pointer; background: #333; color: white; transition: 0.2s; font-size: 13px; }
         button:hover { background: var(--accent); color: #000; }
-        .snap-btn { background: #ff4757; }
-        #meme-input { background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); width: 150px; }
+        .btn-snap { background: var(--red); }
+        #meme-box { background: rgba(255,255,255,0.1); width: 120px; border: 1px solid rgba(255,255,255,0.2); }
     </style>
 </head>
 <body>
 
-    <div id="flash-overlay"></div>
+    <div id="flash"></div>
     <div id="countdown"></div>
-    <div id="toggle-ui" onclick="toggleUI()">👁️</div>
+    <div id="toggle-ui" onclick="document.querySelectorAll('.ui-el').forEach(e=>e.classList.toggle('hidden'))">👁️</div>
 
     <canvas id="mainCanvas"></canvas>
     <video id="video" autoplay playsinline></video>
 
-    <div class="controls ui-element">
-        <button onclick="setFilter('none')">Normal</button>
-        <button onclick="setFilter('grayscale(1)')">B&W</button>
-        <button onclick="setFilter('distort')">Bubble</button>
-        <input type="text" id="meme-input" placeholder="Caption..." oninput="memeText = this.value.toUpperCase()">
-        <button class="snap-btn" onclick="startCapture()">📸 Photo</button>
-        <button style="background:#ffa502" onclick="startRecord()">🎥 5s</button>
-        <label>🖼️ BG <input type="file" hidden onchange="loadBG(event)"></label>
+    <div class="toolbar ui-el">
+        <button onclick="f='none'">Pure</button>
+        <button onclick="f='beauty'">✨</button>
+        <button onclick="f='neon'">⚡</button>
+        <button onclick="f='distort'">🌀</button>
+        <button onclick="sMode='dog'">🐶</button>
+        <button onclick="sMode='sunglasses'">🕶️</button>
+        <input type="text" id="meme-box" placeholder="Meme..." oninput="mText=this.value.toUpperCase()">
+        <button class="btn-snap" onclick="snap()">📸</button>
+        <button style="background:#ffa502" id="recBtn" onclick="record()">🎥</button>
+        <label>🖼️<input type="file" hidden onchange="loadBG(event)"></label>
     </div>
 
-    <div class="gallery-bar ui-element" id="gallery"></div>
+    <div class="side-bar ui-el" id="gallery"></div>
 
     <script>
-        const canvas = document.getElementById('mainCanvas');
-        const ctx = canvas.getContext('2d', { willReadFrequently: true });
-        const video = document.getElementById('video');
-        const shutter = new Audio('https://www.soundjay.com/mechanical/camera-shutter-click-08.mp3');
+        const canvas = document.getElementById('mainCanvas'), ctx = canvas.getContext('2d', { willReadFrequently: true });
+        const video = document.getElementById('video'), shutter = new Audio('https://www.soundjay.com/mechanical/camera-shutter-click-08.mp3');
+        let f='none', sMode='sunglasses', mText="", bgImg=null, faceLandmarker=null;
         
-        let filter = 'none', bgImg = null, memeText = "", detector = null;
-        let sticker = new Image(); sticker.src = 'https://i.imgur.com/39A4D3m.png';
+        // Assets
+        const stickerS = new Image(); stickerS.src = 'https://i.imgur.com/39A4D3m.png';
+        const earL = new Image(); earL.src = 'https://i.imgur.com/vS3Q9R5.png';
+        const earR = new Image(); earR.src = 'https://i.imgur.com/uR3V5fS.png';
 
-        async function init() {
+        async function setupAI() {
+            const vision = await mediapipe.tasks.vision.FilesetResolver.forVisionTasks("https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@0.10.3/wasm");
+            faceLandmarker = await mediapipe.tasks.vision.FaceLandmarker.createFromOptions(vision, {
+                baseOptions: { modelAssetPath: `https://storage.googleapis.com/mediapipe-models/face_landmarker/face_landmarker/float16/1/face_landmarker.task`, delegate: "GPU" },
+                runningMode: "VIDEO", numFaces: 1
+            });
+            startCamera();
+        }
+
+        async function startCamera() {
             const stream = await navigator.mediaDevices.getUserMedia({ video: { width: 1280, height: 720 } });
             video.srcObject = stream;
+            window.onresize = () => { canvas.width = window.innerWidth; canvas.height = window.innerHeight; };
+            window.onresize();
+            requestAnimationFrame(render);
+        }
+
+        function loadBG(e) { const r = new FileReader(); r.onload=v=>{bgImg=new Image(); bgImg.src=v.target.result;}; r.readAsDataURL(e.target.files[0]); }
+
+        function render() {
+            // Draw Background
+            if(bgImg) {
+                const sc = Math.max(canvas.width/bgImg.width, canvas.height/bgImg.height);
+                ctx.drawImage(bgImg, (canvas.width-bgImg.width*sc)/2, (canvas.height-bgImg.height*sc)/2, bgImg.width*sc, bgImg.height*sc);
+            } else { ctx.fillStyle='#000'; ctx.fillRect(0,0,canvas.width,canvas.height); }
+
+            // Mirror Logic
+            const vSc = Math.max(canvas.width/video.videoWidth, canvas.height/video.videoHeight);
+            const vW = video.videoWidth*vSc, vH = video.videoHeight*vSc;
+            const vX = (canvas.width-vW)/2, vY = (canvas.height-vH)/2;
             
-            const model = faceLandmarksDetection.SupportedModels.MediaPipeFaceMesh;
-            detector = await faceLandmarksDetection.createDetector(model, {
-                runtime: 'mediapipe', solutionPath: 'https://cdn.jsdelivr.net/npm/@mediapipe/face_mesh'
-            });
+            ctx.save();
+            ctx.translate(canvas.width, 0); ctx.scale(-1, 1);
+            
+            // Chroma Key Processing (if BG exists)
+            if(bgImg) {
+                const offscreen = new OffscreenCanvas(canvas.width, canvas.height);
+                const oCtx = offscreen.getContext('2d');
+                oCtx.drawImage(video, (canvas.width-vW)/2, vY, vW, vH);
+                let d = oCtx.getImageData(0,0,canvas.width,canvas.height);
+                for(let i=0; i<d.data.length; i+=4) if(d.data[i+1]>95 && d.data[i+1]>d.data[i]*1.3) d.data[i+3]=0;
+                oCtx.putImageData(d,0,0);
+                ctx.drawImage(offscreen, 0, 0);
+            } else {
+                ctx.drawImage(video, vX, vY, vW, vH);
+            }
+            ctx.restore();
 
-            window.addEventListener('resize', () => { canvas.width = window.innerWidth; canvas.height = window.innerHeight; });
-            canvas.width = window.innerWidth; canvas.height = window.innerHeight;
-            render();
-        }
-
-        function toggleUI() { document.querySelectorAll('.ui-element').forEach(el => el.classList.toggle('ui-hidden')); }
-        function setFilter(f) { filter = f; }
-        function loadBG(e) { 
-            const r = new FileReader(); 
-            r.onload = (ev) => { bgImg = new Image(); bgImg.src = ev.target.result; }; 
-            r.readAsDataURL(e.target.files[0]); 
-        }
-
-        async function render() {
-            // 1. Background
-            if (bgImg) {
-                const s = Math.max(canvas.width/bgImg.width, canvas.height/bgImg.height);
-                ctx.drawImage(bgImg, (canvas.width-bgImg.width*s)/2, (canvas.height-bgImg.height*s)/2, bgImg.width*s, bgImg.height*s);
-            } else { ctx.fillStyle = '#000'; ctx.fillRect(0,0,canvas.width,canvas.height); }
-
-            // 2. Process Video (Mirror & Scale)
-            const vS = Math.max(canvas.width/video.videoWidth, canvas.height/video.videoHeight);
-            const vW = video.videoWidth * vS, vH = video.videoHeight * vS;
-            const vX = (canvas.width - vW)/2, vY = (canvas.height - vH)/2;
-
-            const t = document.createElement('canvas'); t.width = canvas.width; t.height = canvas.height;
-            const tc = t.getContext('2d');
-            tc.translate(canvas.width, 0); tc.scale(-1, 1);
-            tc.drawImage(video, vX, vY, vW, vH);
-
-            if (bgImg) {
-                let f = tc.getImageData(0,0,canvas.width,canvas.height);
-                for(let i=0; i<f.data.length; i+=4) if(f.data[i+1]>80 && f.data[i+1]>f.data[i]*1.2) f.data[i+3]=0;
-                tc.putImageData(f, 0, 0);
+            // Post-Processing Filters
+            if(f==='beauty') {
+                ctx.globalAlpha=0.35; ctx.filter='blur(4px) saturate(1.1)'; 
+                ctx.drawImage(canvas, 0, 0); ctx.globalAlpha=1.0; ctx.filter='none';
+            } else if(f !== 'none' && f !== 'distort' && f !== 'neon') {
+                ctx.filter = f; ctx.drawImage(canvas, 0, 0); ctx.filter = 'none';
             }
 
-            // 3. Filters & Distortion
-            ctx.filter = filter === 'distort' ? 'none' : filter;
-            ctx.drawImage(t, 0, 0);
-            ctx.filter = 'none';
-
-            if (detector && video.readyState >= 2) {
-                const faces = await detector.estimateFaces(video);
-                if (faces.length > 0) {
-                    const nose = faces[0].keypoints[168];
-                    const left = faces[0].keypoints[33], right = faces[0].keypoints[263];
-                    const mapX = (x) => canvas.width - ((x / video.videoWidth) * vW + vX);
-                    const mapY = (y) => (y / video.videoHeight) * vH + vY;
+            // AI Features
+            if (faceLandmarker && video.readyState >= 2) {
+                const results = faceLandmarker.detectForVideo(video, performance.now());
+                if (results.faceLandmarks.length > 0) {
+                    const k = results.faceLandmarks[0];
+                    const mapX = (x) => canvas.width - ((x * video.videoWidth * vSc) + vX);
+                    const mapY = (y) => (y * video.videoHeight * vSc) + vY;
+                    
+                    const nose = k[1], lE = k[33], rE = k[263];
                     const fX = mapX(nose.x), fY = mapY(nose.y);
+                    const size = Math.abs(mapX(rE.x) - mapX(lE.x)) * 2.5;
 
-                    if (filter === 'distort') applyBubble(fX, fY);
-                    const sW = Math.abs(mapX(right.x) - mapX(left.x)) * 2.5;
-                    ctx.drawImage(sticker, fX - sW/2, fY - sW/4, sW, sW/2);
+                    if(sMode==='sunglasses') ctx.drawImage(stickerS, fX-size/2, fY-size/4, size, size/2);
+                    else {
+                        const eSize = size*0.8;
+                        ctx.drawImage(earL, mapX(k[103].x)-eSize/2, mapY(k[103].y)-eSize, eSize, eSize);
+                        ctx.drawImage(earR, mapX(k[332].x)-eSize/2, mapY(k[332].y)-eSize, eSize, eSize);
+                    }
                 }
             }
 
-            // 4. Meme Text
-            if (memeText) {
-                ctx.font = `bold ${canvas.width/15}px Impact`; ctx.textAlign = 'center'; ctx.fillStyle = 'white';
-                ctx.strokeStyle = 'black'; ctx.lineWidth = 4;
-                ctx.strokeText(memeText, canvas.width/2, canvas.height-50);
-                ctx.fillText(memeText, canvas.width/2, canvas.height-50);
+            if(mText) {
+                ctx.font=`bold ${canvas.width/15}px Impact`; ctx.textAlign='center'; ctx.fillStyle='white';
+                ctx.strokeStyle='black'; ctx.lineWidth=3;
+                ctx.strokeText(mText, canvas.width/2, canvas.height-50);
+                ctx.fillText(mText, canvas.width/2, canvas.height-50);
             }
 
             requestAnimationFrame(render);
         }
 
-        function applyBubble(cx, cy) {
-            const rad = 200, img = ctx.getImageData(cx-rad, cy-rad, rad*2, rad*2);
-            const out = ctx.createImageData(rad*2, rad*2);
-            for(let y=0; y<rad*2; y++) {
-                for(let x=0; x<rad*2; x++) {
-                    const dx = x-rad, dy = y-rad, dist = Math.sqrt(dx*dx+dy*dy);
-                    if(dist < rad) {
-                        const p = Math.pow(dist/rad, 0.6);
-                        const sx = Math.round(rad + dx*p), sy = Math.round(rad + dy*p);
-                        const i = (y*rad*2+x)*4, si = (sy*rad*2+sx)*4;
-                        for(let k=0; k<4; k++) out.data[i+k] = img.data[si+k];
-                    }
-                }
-            }
-            ctx.putImageData(out, cx-rad, cy-rad);
-        }
-
-        function startCapture() {
-            let s = 3; const el = document.getElementById('countdown');
-            const itv = setInterval(() => {
-                el.innerText = s || "🔥";
-                if(s < 0) {
-                    clearInterval(itv); el.innerText = ""; shutter.play();
-                    document.getElementById('flash-overlay').classList.add('flash-active');
-                    setTimeout(() => document.getElementById('flash-overlay').classList.remove('flash-active'), 100);
-                    save(canvas.toDataURL(), 'img');
+        function snap() {
+            let s=3; const el=document.getElementById('countdown');
+            const i = setInterval(() => {
+                el.innerText = s||"📸";
+                if(s<0) { 
+                    clearInterval(i); el.innerText=""; shutter.play(); 
+                    document.getElementById('flash').classList.add('flash-active');
+                    setTimeout(()=>document.getElementById('flash').classList.remove('flash-active'),150);
+                    save(canvas.toDataURL(), 'img'); 
                 }
                 s--;
             }, 800);
         }
 
-        async function startRecord() {
-            const btn = document.querySelector('[onclick="startRecord()"]'); btn.disabled = true;
+        async function record() {
+            const btn = document.getElementById('recBtn'); btn.disabled=true;
             const stream = canvas.captureStream(30), rec = new MediaRecorder(stream, {mimeType:'video/webm'}), chunks = [];
             rec.ondataavailable = e => chunks.push(e.data);
-            rec.onstop = () => { save(URL.createObjectURL(new Blob(chunks, {type:'video/webm'})), 'video'); btn.disabled = false; };
+            rec.onstop = () => { 
+                const url = URL.createObjectURL(new Blob(chunks, {type:'video/webm'}));
+                save(url, 'video'); btn.disabled=false;
+            };
             rec.start(); setTimeout(() => rec.stop(), 5000);
         }
 
         function save(src, type) {
-            const el = document.createElement(type); el.src = src; el.className = 'gallery-item';
-            if(type === 'video') el.controls = true;
-            el.onclick = () => { const a = document.createElement('a'); a.href = src; a.download = `art-${Date.now()}`; a.click(); };
+            const el = document.createElement(type); el.src=src; el.className='gallery-item'; if(type==='video') el.controls=true;
+            el.onclick=()=>{ const a = document.createElement('a'); a.href=src; a.download=`AI-Lens-${Date.now()}`; a.click(); };
             document.getElementById('gallery').prepend(el);
         }
 
-        init();
+        setupAI();
     </script>
 </body>
 </html>
