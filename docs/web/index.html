@@ -3,208 +3,147 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AI Cinematic Studio Pro</title>
+    <title>AI Studio | Polaroid Edition</title>
     
     <script src="https://cdn.jsdelivr.net/npm/@mediapipe/camera_utils/camera_utils.js" crossorigin="anonymous"></script>
     <script src="https://cdn.jsdelivr.net/npm/@mediapipe/face_mesh/face_mesh.js" crossorigin="anonymous"></script>
 
     <style>
-        :root { --accent: #00d2ff; --glass: rgba(0,0,0,0.85); --red: #ff4757; }
-        body, html { margin: 0; padding: 0; width: 100%; height: 100%; overflow: hidden; background: #000; font-family: 'Segoe UI', system-ui, sans-serif; color: white; }
+        :root { --accent: #00d2ff; --glass: rgba(0,0,0,0.85); }
+        body, html { margin: 0; padding: 0; width: 100%; height: 100%; overflow: hidden; background: #000; font-family: 'Segoe UI', sans-serif; color: white; }
         
         #mainCanvas { width: 100vw; height: 100vh; object-fit: cover; display: block; }
         video { display: none; }
         
-        /* Loading Screen */
-        #loader { position: fixed; inset: 0; background: #000; z-index: 5000; display: flex; flex-direction: column; align-items: center; justify-content: center; transition: 0.5s; }
-        .spinner { width: 45px; height: 45px; border: 4px solid rgba(255,255,255,0.1); border-top-color: var(--accent); border-radius: 50%; animation: spin 0.8s linear infinite; }
+        /* Polaroid Preview Logic */
+        #polaroid-container {
+            position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%) scale(0) rotate(-10deg);
+            background: #fff; padding: 15px 15px 60px 15px; box-shadow: 0 20px 50px rgba(0,0,0,0.8);
+            transition: all 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275); z-index: 4000; pointer-events: none;
+        }
+        #polaroid-container.active { transform: translate(-50%, -50%) scale(1) rotate(2deg); opacity: 1; }
+        #polaroid-container.exit { transform: translate(-50%, -150%) scale(0.5) rotate(15deg); opacity: 0; }
+        #polaroid-img { width: 300px; height: 300px; object-fit: cover; display: block; border: 1px solid #eee; }
+
+        /* General UI */
+        #loader { position: fixed; inset: 0; background: #000; z-index: 5000; display: flex; align-items: center; justify-content: center; transition: 0.5s; }
+        .spinner { width: 40px; height: 40px; border: 4px solid rgba(255,255,255,0.1); border-top-color: var(--accent); border-radius: 50%; animation: spin 0.8s linear infinite; }
         @keyframes spin { to { transform: rotate(360deg); } }
         
-        /* UI Overlays */
-        #countdown { position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); font-size: 10rem; font-weight: 900; z-index: 2000; pointer-events: none; color: #fff; text-shadow: 0 0 30px rgba(0,0,0,0.8); }
         #flash { position: fixed; inset: 0; background: white; opacity: 0; pointer-events: none; z-index: 3000; }
         .flash-active { animation: flashAnim 0.4s ease-out; }
         @keyframes flashAnim { 0% { opacity: 1; } 100% { opacity: 0; } }
 
-        .toolbar { position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%); display: flex; gap: 12px; padding: 12px 24px; border-radius: 50px; background: var(--glass); backdrop-filter: blur(25px); border: 1px solid rgba(255,255,255,0.15); z-index: 1000; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
-        button { padding: 10px 20px; border-radius: 20px; border: none; font-weight: bold; cursor: pointer; background: #222; color: white; transition: 0.2s; font-size: 12px; text-transform: uppercase; letter-spacing: 1px; }
-        button:hover { background: var(--accent); color: #000; transform: translateY(-2px); }
-        button:active { transform: translateY(0); }
-        button:disabled { opacity: 0.5; cursor: not-allowed; }
-        
-        .side-bar { position: fixed; top: 20px; right: 20px; width: 140px; height: 85vh; overflow-y: auto; display: flex; flex-direction: column; gap: 12px; z-index: 1000; scrollbar-width: none; }
-        .gallery-item { width: 100%; border-radius: 12px; border: 2px solid rgba(255,255,255,0.1); cursor: pointer; transition: 0.3s; }
-        .gallery-item:hover { border-color: var(--accent); transform: scale(1.05); }
-
-        #status { position: fixed; top: 20px; left: 20px; font-family: monospace; font-size: 12px; color: #0f0; background: var(--glass); padding: 5px 10px; border-radius: 5px; }
+        .toolbar { position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%); display: flex; gap: 10px; padding: 12px 20px; border-radius: 50px; background: var(--glass); backdrop-filter: blur(20px); border: 1px solid rgba(255,255,255,0.1); z-index: 1000; }
+        button, input { padding: 10px 18px; border-radius: 20px; border: none; font-weight: bold; cursor: pointer; background: #222; color: white; font-size: 11px; }
+        input { cursor: text; background: rgba(255,255,255,0.1); width: 100px; }
     </style>
 </head>
 <body>
 
-    <div id="loader">
-        <div class="spinner"></div>
-        <p style="margin-top:20px; letter-spacing: 2px; font-size: 10px;">INITIALIZING ENGINE</p>
-    </div>
-    
+    <div id="loader"><div class="spinner"></div></div>
     <div id="flash"></div>
-    <div id="countdown"></div>
-    <div id="status">FPS: <span id="fps">--</span></div>
+
+    <div id="polaroid-container">
+        <img id="polaroid-img" src="">
+    </div>
 
     <canvas id="mainCanvas"></canvas>
     <video id="video" autoplay playsinline></video>
 
     <div class="toolbar">
-        <button onclick="sMode='pure'">Pure</button>
+        <input type="text" id="memeText" placeholder="CAPTION..." oninput="mText=this.value.toUpperCase()">
+        <button onclick="sMode='shades'">🕶️ Shades</button>
         <button onclick="sMode='glow'">🌈 Glow</button>
-        <button onclick="sMode='dog'">🐶 Dog</button>
-        <button id="cinemaBtn" onclick="useCinema=!useCinema" style="border: 1px solid var(--accent)">🎬 Cinema</button>
-        <button id="snapBtn" style="background:var(--red)" onclick="snap()">📸 SNAP</button>
-    </div>
-
-    <div class="side-bar" id="gallery">
-        <button id="dl-all" onclick="downloadAll()" style="display:none; background:var(--accent); color:#000; width:100%;">SAVE ALL</button>
+        <button id="snapBtn" style="background:#ff4757" onclick="snap()">📸 SNAP</button>
     </div>
 
     <script>
-        const canvas = document.getElementById('mainCanvas'), ctx = canvas.getContext('2d', { alpha: false });
+        const canvas = document.getElementById('mainCanvas'), ctx = canvas.getContext('2d');
         const video = document.getElementById('video');
-        let sMode='glow', faceResults = null, useCinema = true, lastFrameTime = 0;
+        let sMode='glow', faceResults = null, mText = "";
 
-        // Assets
-        const earL = new Image(); earL.src = 'https://i.imgur.com/vS3Q9R5.png';
-        const earR = new Image(); earR.src = 'https://i.imgur.com/uR3V5fS.png';
+        // Procedural Glasses
+        function drawShades(x, y, size) {
+            ctx.fillStyle = "rgba(15,15,15,0.98)";
+            ctx.beginPath();
+            ctx.roundRect(x - size*0.48, y - size*0.1, size*0.42, size*0.25, 5);
+            ctx.roundRect(x + size*0.06, y - size*0.1, size*0.42, size*0.25, 5);
+            ctx.fill();
+        }
 
         async function init() {
             const faceMesh = new FaceMesh({locateFile: (f) => `https://cdn.jsdelivr.net/npm/@mediapipe/face_mesh/${f}`});
-            
-            faceMesh.setOptions({
-                maxNumFaces: 1,
-                refineLandmarks: true, // Enables Iris points 468-477
-                minDetectionConfidence: 0.6,
-                minTrackingConfidence: 0.6
-            });
-
-            faceMesh.onResults((res) => { faceResults = res; });
-
-            const camera = new Camera(video, {
-                onFrame: async () => { await faceMesh.send({image: video}); },
-                width: 1280, height: 720
-            });
-
-            camera.start().then(() => {
-                document.getElementById('loader').style.opacity = '0';
-                setTimeout(() => document.getElementById('loader').remove(), 500);
-                
-                window.onresize = () => {
-                    canvas.width = window.innerWidth;
-                    canvas.height = window.innerHeight;
-                };
-                window.onresize();
-                requestAnimationFrame(render);
-            });
+            faceMesh.setOptions({ maxNumFaces: 1, refineLandmarks: true, minDetectionConfidence: 0.5 });
+            faceMesh.onResults(res => faceResults = res);
+            new Camera(video, { onFrame: async () => await faceMesh.send({image: video}), width: 1280, height: 720 }).start()
+                .then(() => { 
+                    document.getElementById('loader').remove(); 
+                    window.onresize = () => { canvas.width = window.innerWidth; canvas.height = window.innerHeight; };
+                    window.onresize(); render();
+                });
         }
 
-        function render(now) {
-            // FPS Counter
-            const delta = (now - lastFrameTime) / 1000;
-            lastFrameTime = now;
-            if (Math.random() > 0.9) document.getElementById('fps').innerText = Math.round(1/delta);
-
+        function render() {
             const vSc = Math.max(canvas.width/video.videoWidth, canvas.height/video.videoHeight);
             const vW = video.videoWidth*vSc, vH = video.videoHeight*vSc;
             const vX = (canvas.width-vW)/2, vY = (canvas.height-vH)/2;
             
-            // 1. Draw Mirrored Video
             ctx.save();
             ctx.translate(canvas.width, 0); ctx.scale(-1, 1);
             ctx.drawImage(video, vX, vY, vW, vH);
             ctx.restore();
 
-            // 2. AI AR Tracking
             if (faceResults && faceResults.multiFaceLandmarks.length > 0) {
                 const k = faceResults.multiFaceLandmarks[0];
                 const mX = (x) => canvas.width - ((x * video.videoWidth * vSc) + vX);
                 const mY = (y) => (y * video.videoHeight * vSc) + vY;
+                const size = Math.abs(mX(k[263].x) - mX(k[33].x)) * 2.5;
 
+                if (sMode === 'shades') drawShades(mX(k[1].x), mY(k[1].y), size);
                 if (sMode === 'glow') {
-                    // Reactive Iris Glow (Hue depends on mouth opening)
-                    const openDist = Math.abs(k[13].y - k[14].y);
-                    const hue = Math.min(openDist * 2800, 360);
-                    const glowColor = `hsl(${hue}, 100%, 65%)`;
-
-                    [k[468], k[473]].forEach(iris => {
-                        const x = mX(iris.x), y = mY(iris.y);
-                        ctx.save();
-                        ctx.shadowBlur = 30; ctx.shadowColor = glowColor;
-                        ctx.fillStyle = "#fff";
-                        ctx.beginPath(); ctx.arc(x, y, 6, 0, Math.PI*2); ctx.fill();
-                        ctx.restore();
+                    const hue = Math.abs(k[13].y - k[14].y) * 2500;
+                    [k[468], k[473]].forEach(i => {
+                        ctx.save(); ctx.shadowBlur = 20; ctx.shadowColor = `hsl(${hue},100%,60%)`;
+                        ctx.fillStyle = "#fff"; ctx.beginPath(); ctx.arc(mX(i.x), mY(i.y), 6, 0, 7); ctx.fill(); ctx.restore();
                     });
-                } else if (sMode === 'dog') {
-                    const size = Math.abs(mX(k[263].x) - mX(k[33].x)) * 2.5;
-                    ctx.drawImage(earL, mX(k[103].x)-size*0.4, mY(k[103].y)-size*0.8, size*0.8, size*0.8);
-                    ctx.drawImage(earR, mX(k[332].x)-size*0.4, mY(k[332].y)-size*0.8, size*0.8, size*0.8);
                 }
             }
 
-            // 3. Cinematic Filter Pass
-            if (useCinema) {
-                // Vignette Effect
-                const grad = ctx.createRadialGradient(canvas.width/2, canvas.height/2, 0, canvas.width/2, canvas.height/2, canvas.width/1.1);
-                grad.addColorStop(0, 'rgba(0,0,0,0)');
-                grad.addColorStop(1, 'rgba(0,0,0,0.7)');
-                ctx.fillStyle = grad;
-                ctx.fillRect(0, 0, canvas.width, canvas.height);
-
-                // Film Grain
-                ctx.fillStyle = "rgba(255,255,255,0.04)";
-                for(let i=0; i<150; i++) {
-                    ctx.fillRect(Math.random()*canvas.width, Math.random()*canvas.height, 1, 1);
-                }
+            // Fixed Meme Text logic
+            if (mText) { 
+                ctx.font = `bold ${canvas.width / 18}px Impact`; 
+                ctx.textAlign = 'center'; 
+                ctx.fillStyle = 'white'; 
+                ctx.strokeStyle = 'black'; 
+                ctx.lineWidth = 3; 
+                ctx.strokeText(mText, canvas.width / 2, canvas.height - 60); 
+                ctx.fillText(mText, canvas.width / 2, canvas.height - 60); 
             }
+
             requestAnimationFrame(render);
         }
 
         function snap() {
-            let timeLeft = 3;
-            const cEl = document.getElementById('countdown');
-            const btn = document.getElementById('snapBtn');
-            btn.disabled = true;
+            // Flash feedback
+            const flash = document.getElementById('flash');
+            flash.classList.add('flash-active');
+            setTimeout(() => flash.classList.remove('flash-active'), 400);
 
-            const timer = setInterval(() => {
-                cEl.innerText = timeLeft;
-                if (timeLeft <= 0) {
-                    clearInterval(timer);
-                    cEl.innerText = "";
-                    
-                    // Visual/Audio Feedback
-                    document.getElementById('flash').classList.add('flash-active');
-                    setTimeout(() => document.getElementById('flash').classList.remove('flash-active'), 400);
-                    
-                    // Capture
-                    const data = canvas.toDataURL('image/png');
-                    const img = document.createElement('img');
-                    img.src = data; img.className = 'gallery-item';
-                    img.onclick = () => { const a = document.createElement('a'); a.href=data; a.download='studio-snap.png'; a.click(); };
-                    
-                    document.getElementById('gallery').appendChild(img);
-                    document.getElementById('dl-all').style.display = 'block';
-                    btn.disabled = false;
-                }
-                timeLeft--;
-            }, 1000);
-        }
+            // Capture and show Polaroid
+            const data = canvas.toDataURL('image/png');
+            const container = document.getElementById('polaroid-container');
+            const img = document.getElementById('polaroid-img');
+            
+            img.src = data;
+            container.classList.remove('exit');
+            container.classList.add('active');
 
-        function downloadAll() {
-            const snaps = document.querySelectorAll('.gallery-item');
-            snaps.forEach((img, i) => {
-                setTimeout(() => {
-                    const a = document.createElement('a');
-                    a.href = img.src;
-                    a.download = `lens-collection-${i+1}.png`;
-                    a.click();
-                }, i * 300);
-            });
+            // 5 second delay then disappear
+            setTimeout(() => {
+                container.classList.remove('active');
+                container.classList.add('exit');
+            }, 5000);
         }
 
         init();
